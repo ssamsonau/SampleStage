@@ -40,12 +40,22 @@ ui <- fluidPage(
         numericInput("distance_between_dots",
                      "Specify distance between dots (both x and y) in mm",
                      value = 1),
-        numericInput("time_to_stay_in_each_dot",
-                     "Time to stay in each dot (in sec)",
-                     value = 1),
         numericInput("xyRange",
                      "specify range of mapping (range of total x and y movement) in mm",
                      value = 15),
+        numericInput("time_to_stay_in_each_dot",
+                     "Time to stay in each dot (in sec)",
+                     value = 10),
+        numericInput("spectrum_collection_time", 
+                  "Time setup in Andor Solis for specrum collection (in sec). 
+                  Should be at least 5 seconds less than time of stay in one dot", 
+                  value = 5),
+        
+        textInput("coordinates_of_save_button_for_mouse",
+                  "Specify coordinates of 'save' button on Andor Solis",
+                  value = "80, 100"),
+        
+       # actionButton("stop", "Stop"),
         
         h4("(will move in dot by dot pattern,
                      starting with present position. First go up, then right, then donw, then right, then up, etc."),
@@ -66,6 +76,11 @@ server <- function(input, output) {
   library(serial)
   library(tidyverse)
   library(stringr)
+  library(rMouse)
+  # library(rJava)                     # load package
+  # .jinit()                           # this starts the JVM
+  # jRobot <- .jnew("java/awt/Robot")  # Create object of the Robot class
+  # 
   
   source("connection.R", local = T)
    

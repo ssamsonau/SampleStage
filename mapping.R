@@ -26,6 +26,10 @@ observeEvent(input$do_mapping_but,{
       
       while(y + step <= input$xyRange){
         
+        if (values$STOPIT) {
+          return()
+        }
+        
         current_N <- current_N + 1
         incProgress(1/N , detail = paste0("Doing dot ", current_N, " out of ", N,  "\n Current position: x = ", x, ", y =", y, "\n"))
         
@@ -38,9 +42,38 @@ observeEvent(input$do_mapping_but,{
         
         Sys.sleep(input$time_to_stay_in_each_dot)
         
+        ## r program takes only right part of scren. 
+        ## Andor solis in background open to full screen. 
+        ## Move mouse to "take spectrum" button and press it
+        ## Andor solis should be set up (time of collection etc.) before process starts
+        
+        rMouse::delay(100)
+        #rMouse::move(20, 20)
+        #rMouse::left()
+        rMouse::delay(input$spectrum_collection_time)
+        #rMouse::pos()
+      
+        #based on implementation of rMouse::specialKey(), 
+        # another option - see https://stackoverflow.com/questions/19724305/can-i-control-the-mouse-cursor-from-within-r
+        # list of vk keys codes https://stackoverflow.com/questions/15313469/java-keyboard-keycodes-list
+        move(845,98)
+        left()
+        jRobot$keyPress(as.integer(17)) # Ctrl
+        #jRobot$keyPress(as.integer(16)) # Shift
+        jRobot$keyPress(as.integer(83)) # S
+        jRobot$keyRelease(as.integer(17)) # Ctrl
+        #jRobot$keyRelease(as.integer(16)) 
+        jRobot$keyRelease(as.integer(83)) # S
+        
+        rMouse::type(paste("position, ,", x, ", ", y, ".R")) #special characters not allowed
+        #rMouse::delay(2000)
+        
+        rMouse::specialKey("ENTER")
+        
+        #rMouse::delay(100)
+        
+        
         y <- y + step
-        
-        
         
         values$df <- values$df %>%
           dplyr::bind_rows(
@@ -49,6 +82,10 @@ observeEvent(input$do_mapping_but,{
               y = y
             )
           )
+      }
+      
+      if (values$STOPIT) {
+        return()
       }
       
       command <- paste0("G1",
@@ -64,8 +101,14 @@ observeEvent(input$do_mapping_but,{
       
       
     }  
+    values$STOPIT <- FALSE
+    
   })
   
+  
+  observeEvent(input$stop, {
+    values$STOPIT <- TRUE
+  })
   
   output$plot_dots <- renderPlot({
     ggplot(values$df) +
