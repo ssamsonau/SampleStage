@@ -1,7 +1,5 @@
 
-values$image_xy <- NULL
-
-observeEvent(input$file1, {
+image_xy <- reactive({
   inFile <- input$file1
   
   if (is.null(inFile)){
@@ -27,9 +25,10 @@ observeEvent(input$file1, {
   xy <- coord[ , 1:2] %>%
     as_tibble
   
-  range(xy)
+  #range(xy)
+  #browser()
   
-  conversion <- range(xy)[1]/input$desired_x_range
+  conversion <- diff(range(xy$dim1)) / input$desired_x_range
   
   
   xy <- xy %>%
@@ -41,15 +40,15 @@ observeEvent(input$file1, {
            dim2 = round(dim2, digits = 3)) %>% # round down to 1 micron
     distinct()
 
-  values$image_xy <- xy  
+  xy
 })
 
 
 output$image <- renderPlot({
-  if(is.null(values$image_xy))
+  if(is.null(image_xy()))
     return()
   
-  xy <- values$image_xy
+  xy <- image_xy()
   
   plot(x = xy$dim1, y = xy$dim2, asp = 1,
        xlab = "x (mm)", ylab = "y (mm)"
@@ -57,17 +56,17 @@ output$image <- renderPlot({
 })
 
 output$image_table <- DT::renderDataTable({
-  if(is.null(values$image_xy))
+  if(is.null(image_xy()))
     return()
   
-  values$image_xy
+  image_xy()
 })
 
 observeEvent(input$move_by_picture_but, {
-  if(is.null(values$image_xy))
+  if(is.null(image_xy()))
     return()
   
-  xy <- values$image_xy
+  xy <- image_xy()
   
   # now just do absolute positioning and go between dots
   
