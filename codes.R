@@ -2,9 +2,12 @@ library(serial)
 library(stringr)
 
 
+#commands https://github.com/grbl/grbl/wiki
+# http://www.linuxcnc.org/docs/2.5/html/gcode/gcode.html
+
 # G90/G91 swithing between relative and abs modes
 # G1X0Y0 - return to zero position
-# G1F1 - set speed (number after F in mm/sec probably)
+# G1F1 - set speed (number after F in mm/min)
 # M114 - return current position
 # G92 - X0Y0 setup
 

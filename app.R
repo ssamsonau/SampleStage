@@ -26,40 +26,53 @@ ui <- fluidPage(
         actionButton("disconnect", "Close connection"),
         h4("-----"),
         
+        numericInput("speed", 
+                     "How fast should the stage move (mm/sec)",  # program takes mm/min, so it should be later * 60
+                     value = 0.02),
+        
         ## USE inkscape svg - to path to specify coordinates for continous motion with a selected speed
         # http://www.inkscapeforum.com/viewtopic.php?t=11228
         
-        # actionButton("set_current_asX0Y0", "Set current position as X0Y0 - zero of coordinate system"), # not implemented
+        
         # 
         textInput("move_by_xy",
                      "Move sample by so many mm: X, Y",
-                     value = "-1, 1"),
+                     value = "-0.1, 0.1"),
         actionButton("move_now_but", "Move now"), # not implement
+        actionButton("set_current_asX0Y0", "Set current position as X0Y0"), 
+        actionButton("return_toX0Y0", "Return to X0Y0"), 
         
         h4("-----"),
         numericInput("distance_between_dots",
                      "Specify distance between dots (both x and y) in mm",
-                     value = 1),
+                     value = 0.1),
         numericInput("xyRange",
                      "specify range of mapping (range of total x and y movement) in mm",
-                     value = 15),
-        numericInput("time_to_stay_in_each_dot",
-                     "Time to stay in each dot (in sec)",
-                     value = 10),
+                     value = 0.5),
+
+        # numericInput("time_takes_to_move",
+        #              "Time it takes to move between dots (in sec)",
+        #              value = 2),
+        # numericInput("time_to_stay_in_each_dot",
+        #              "Time to stay in each dot (in sec)",
+        #              value = 10),
         numericInput("spectrum_collection_time", 
-                  "Time setup in Andor Solis for specrum collection (in sec). 
-                  Should be at least 5 seconds less than time of stay in one dot", 
+                  "Time setup in Andor Solis for specrum collection (in sec)", 
                   value = 5),
         
-        textInput("coordinates_of_save_button_for_mouse",
-                  "Specify coordinates of 'save' button on Andor Solis",
-                  value = "80, 100"),
+        textInput("coordinates_of_takeSignal_button_for_mouse",
+                  "Specify coordinates of 'Take signal' button on Andor Solis",
+                  value = "158, 70"),
+        # textInput("coordinates_of_save_button_for_mouse",
+        #           "Specify coordinates of 'Save' button on Andor Solis",
+        #           value = "84, 70"),
         
        # actionButton("stop", "Stop"),
         
         h4("(will move in dot by dot pattern,
                      starting with present position. First go up, then right, then donw, then right, then up, etc."),
-        actionButton("do_mapping_but", "Execute mapping") # not implement
+        actionButton("do_mapping_but", "Execute mapping"),
+        actionButton("stop_mapping_but", "Interupt (stop) mapping (DOES NOT WORK...")
       ),
       
       # Show a plot of the generated distribution

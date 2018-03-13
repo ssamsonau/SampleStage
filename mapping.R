@@ -1,8 +1,10 @@
+values$STOPIT <- F
+
 observeEvent(input$do_mapping_but,{
   
   
-  write.serialConnection(con, "G90"); Sys.sleep(0.1) #relative positioning
-  write.serialConnection(con, "G1F1"); Sys.sleep(0.1) # set speed
+  write.serialConnection(con, "G91"); Sys.sleep(0.1) #relative positioning
+  write.serialConnection(con, paste0("G1F", input$speed*60)); Sys.sleep(1) # set speed
   
   step <- input$distance_between_dots
   
@@ -18,13 +20,18 @@ observeEvent(input$do_mapping_but,{
   
   current_N <- 0
   
-  Sys.sleep(input$time_to_stay_in_each_dot)
+  Sys.sleep(input$spectrum_collection_time * 1.2)
+  
+  #browser()
   
   withProgress(message = 'Moving', value = 0, {
     
-    while(x + step <= input$xyRange){
+    goingUpOrDown <- 1
+    time_takes_to_move <- step/input$speed
+    
+    while(x < input$xyRange + step * 0.5){
       
-      while(y + step <= input$xyRange){
+      while(between(y, -step * 0.5, input$xyRange + step * 0.5)){
         
         if (values$STOPIT) {
           return()
@@ -34,14 +41,6 @@ observeEvent(input$do_mapping_but,{
         incProgress(1/N , detail = paste0("Doing dot ", current_N, " out of ", N,  "\n Current position: x = ", x, ", y =", y, "\n"))
         
         #browser()
-        command <- paste0("G1",
-                          "X", 0, 
-                          "Y", step)
-        
-        write.serialConnection(con, command);
-        
-        Sys.sleep(input$time_to_stay_in_each_dot)
-        
         ## r program takes only right part of scren. 
         ## Andor solis in background open to full screen. 
         ## Move mouse to "take spectrum" button and press it
@@ -50,30 +49,54 @@ observeEvent(input$do_mapping_but,{
         rMouse::delay(100)
         #rMouse::move(20, 20)
         #rMouse::left()
-        rMouse::delay(input$spectrum_collection_time)
         #rMouse::pos()
       
         #based on implementation of rMouse::specialKey(), 
         # another option - see https://stackoverflow.com/questions/19724305/can-i-control-the-mouse-cursor-from-within-r
         # list of vk keys codes https://stackoverflow.com/questions/15313469/java-keyboard-keycodes-list
-        move(845,98)
+        #move(845,98)
+        
+        
+        ## Press button to take signal
+        xy_take <- input$coordinates_of_takeSignal_button_for_mouse
+        xy_take <- str_split(xy_take, ",", simplify = T) %>%
+          as.numeric()
+        
+        rMouse::move(xy_take[1], xy_take[2])
+        
         left()
+        Sys.sleep(input$spectrum_collection_time * 1.2) 
+        
+        # Now save it
+        
         jRobot$keyPress(as.integer(17)) # Ctrl
         #jRobot$keyPress(as.integer(16)) # Shift
         jRobot$keyPress(as.integer(83)) # S
         jRobot$keyRelease(as.integer(17)) # Ctrl
         #jRobot$keyRelease(as.integer(16)) 
         jRobot$keyRelease(as.integer(83)) # S
+        # 
+        # if(!dir.exists(paste0(getwd(), "/results")))
+        #   dir.create(paste0(getwd(), "/results"))
+        # 
+        #string_to_type <- paste0(getwd(), "/results/", "position ", x, ", ", y) 
+        string_to_type <- paste0("position ", round(x, digits = 5), ", ", round(y, digits = 5)) 
         
-        rMouse::type(paste("position, ,", x, ", ", y, ".R")) #special characters not allowed
-        #rMouse::delay(2000)
+        string_to_type <- str_replace_all(string_to_type, 
+                                           "\\.", "-")
+        string_to_type <- paste0(string_to_type)
+        rMouse::type(string_to_type) #special characters not allowed
+#rMouse::delay(2000)
         
+        rMouse::delay(100)
         rMouse::specialKey("ENTER")
-        
+        rMouse::delay(200)
+        rMouse::specialKey("ENTER")
+        rMouse::delay(200)
         #rMouse::delay(100)
         
         
-        y <- y + step
+        
         
         values$df <- values$df %>%
           dplyr::bind_rows(
@@ -82,23 +105,41 @@ observeEvent(input$do_mapping_but,{
               y = y
             )
           )
+        #browser()
+        # x and y are switched on actuall device
+        
+        if(between(y + goingUpOrDown * step, -step * 0.5, input$xyRange + step * 0.5)){
+          command <- paste0("G1",
+                            "X", goingUpOrDown * step, 
+                            "Y", 0)
+          
+          write.serialConnection(con, command);
+          Sys.sleep(time_takes_to_move * 1.2)  
+        }
+        
+        
+        y <- y + goingUpOrDown * step
+        
       }
       
       if (values$STOPIT) {
         return()
       }
       
+      goingUpOrDown <- goingUpOrDown * (-1)
+      
+      # x and y are switched on actuall device
       command <- paste0("G1",
-                        "X", x + step, 
-                        "Y", -y)
+                        "X", 0, 
+                        "Y", step)
       
       write.serialConnection(con, command);
+      Sys.sleep(time_takes_to_move * 1.2)
       
-      Sys.sleep(input$time_to_stay_in_each_dot)
       
       x <- x + step
-      y <- 0
       
+      y <- y + goingUpOrDown * step
       
     }  
     values$STOPIT <- FALSE
@@ -106,7 +147,7 @@ observeEvent(input$do_mapping_but,{
   })
   
   
-  observeEvent(input$stop, {
+  observeEvent(input$stop_mapping_but, {
     values$STOPIT <- TRUE
   })
   
