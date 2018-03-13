@@ -87,6 +87,12 @@ ui <- fluidPage(
                                 accept = c(".png", ".jpg", ".jpeg", ".PNG", ".JPG", ".JPEG")
                       ),
                       plotOutput("image"),
+                      
+                      numericInput("desired_x_range", 
+                                   "desired x range of values in Image (in mm)", 
+                                   value = 1),
+                      helpText("Coordinates are rounded to 1 micron resolution"),
+                      
                       numericInput("time_to_stay_in_dot",
                                    "Time to stay in each dot (in sec)",
                                    value = 1),

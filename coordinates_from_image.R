@@ -29,8 +29,7 @@ observeEvent(input$file1, {
   
   range(xy)
   
-  desired_x_range <- 1 # in mm
-  conversion <- range(xy)[1]/desired_x_range
+  conversion <- range(xy)[1]/input$desired_x_range
   
   
   xy <- xy %>%
@@ -52,7 +51,9 @@ output$image <- renderPlot({
   
   xy <- values$image_xy
   
-  plot(x = xy$dim1, y = xy$dim2, asp = 1)
+  plot(x = xy$dim1, y = xy$dim2, asp = 1,
+       xlab = "x (mm)", ylab = "y (mm)"
+       )
 })
 
 output$image_table <- DT::renderDataTable({
