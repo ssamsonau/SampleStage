@@ -97,8 +97,8 @@ observeEvent(input$move_by_picture_but, {
     
     xy_current <- c(0, 0)
     
-    #for(i in 1:nrow(xy)){
-    for(i in 1:10){
+    for(i in 1:nrow(xy)){
+    #for(i in 1:10){
 
       x <- xy[i, 1] %>% as.numeric()
       y <- xy[i, 2] %>% as.numeric()
