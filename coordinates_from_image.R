@@ -30,14 +30,26 @@ image_xy <- reactive({
   
   conversion <- diff(range(xy$dim1)) / input$desired_x_range
   
+  #browser()
+  
+  custom_round <- function(num_vect, precision){
+    sapply(num_vect, function(x) {
+      times <- x %/% precision
+      
+      if(x %% precision > precision/2)
+        return((times + 1) * precision)
+      else
+        return(times * precision )
+    })
+  }
   
   xy <- xy %>%
     mutate(dim1 = dim1 - min(dim1), 
            dim2 = dim2 - min(dim2)) %>%
     mutate(dim1 = dim1/conversion, 
            dim2 = dim2/conversion) %>%
-    mutate(dim1 = round(dim1, digits = 3), 
-           dim2 = round(dim2, digits = 3)) %>% # round down to 1 micron
+    mutate(dim1 = custom_round(dim1, input$resolution_size), 
+           dim2 = custom_round(dim2, input$resolution_size)) %>% 
     distinct()
 
   xy
@@ -51,7 +63,7 @@ output$image <- renderPlot({
   xy <- image_xy()
   
   plot(x = xy$dim1, y = xy$dim2, asp = 1,
-       xlab = "x (mm)", ylab = "y (mm)"
+       xlab = "x (mm)", ylab = "y (mm)", pch = 20
        )
 })
 

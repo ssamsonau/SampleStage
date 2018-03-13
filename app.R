@@ -75,7 +75,7 @@ ui <- fluidPage(
                              
                              # actionButton("stop", "Stop"),
                              
-                             h4("(will move in dot by dot pattern,
+                             helpText("(will move in dot by dot pattern,
                                 starting with present position. First go up, then right, then donw, then right, then up, etc."),
                              actionButton("do_mapping_but", "Execute mapping"),
                              actionButton("stop_mapping_but", "Interupt (stop) mapping (DOES NOT WORK..."),
@@ -91,7 +91,10 @@ ui <- fluidPage(
                       numericInput("desired_x_range", 
                                    "desired x range of values in Image (in mm)", 
                                    value = 1),
-                      helpText("Coordinates are rounded to 1 micron resolution"),
+                      
+                      numericInput("resolution_size", 
+                                   "Round coordinates to this size (in mm)", 
+                                   value = 0.01),
                       
                       numericInput("time_to_stay_in_dot",
                                    "Time to stay in each dot (in sec)",
