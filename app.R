@@ -28,7 +28,7 @@ ui <- fluidPage(
         h4("-----"),
         
         numericInput("speed", 
-                     "Set up spped of stage motion (mm/sec)",  # program takes mm/min, so it should be later * 60
+                     "Set up speed of stage motion (mm/sec)",  # program takes mm/min, so it should be later * 60
                      value = 0.02),
         
         ## USE inkscape svg - to path to specify coordinates for continous motion with a selected speed
