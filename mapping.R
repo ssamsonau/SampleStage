@@ -2,6 +2,11 @@ values$STOPIT <- F
 
 observeEvent(input$do_mapping_but,{
   
+  if(is.null(check_connection()))
+    return(NULL)
+  
+  con <- values$con
+  
   
   write.serialConnection(con, "G91"); Sys.sleep(0.1) #relative positioning
   write.serialConnection(con, paste0("G1F", input$speed*60)); Sys.sleep(1) # set speed
@@ -20,7 +25,7 @@ observeEvent(input$do_mapping_but,{
   
   current_N <- 0
   
-  Sys.sleep(input$spectrum_collection_time * 1.2)
+  #Sys.sleep(input$spectrum_collection_time * 1.2)
   
   #browser()
   

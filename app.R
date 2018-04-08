@@ -78,7 +78,7 @@ ui <- fluidPage(
                              helpText("(will move in dot by dot pattern,
                                 starting with present position. First go up, then right, then donw, then right, then up, etc."),
                              actionButton("do_mapping_but", "Execute mapping"),
-                             actionButton("stop_mapping_but", "Interupt (stop) mapping (DOES NOT WORK..."),
+                             #actionButton("stop_mapping_but", "Interupt (stop) mapping (DOES NOT WORK..."),
                              
                              plotOutput("plot_dots")
                     ),

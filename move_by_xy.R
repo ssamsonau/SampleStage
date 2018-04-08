@@ -1,5 +1,13 @@
 
+
+
 observeEvent(input$move_now_but, {
+  
+  if(is.null(check_connection()))
+    return(NULL)
+  
+  con <- values$con
+  
   write.serialConnection(con, "G91"); Sys.sleep(1) #relative positioning
   write.serialConnection(con, paste0("G1F", input$speed*60)); Sys.sleep(1) # set speed
   
@@ -15,12 +23,23 @@ observeEvent(input$move_now_but, {
 })
 
 observeEvent(input$set_current_asX0Y0, {
+  
+  if(is.null(check_connection()))
+    return(NULL)
+  
+  con <- values$con
+  
   write.serialConnection(con, "G90"); Sys.sleep(1)  # absolute position mode
   write.serialConnection(con, paste0("G1F", input$speed*60)); Sys.sleep(1) # set speed
   write.serialConnection(con, "G92X0Y0"); Sys.sleep(1)  # X0Y0 setup
 })
 
 observeEvent(input$return_toX0Y0, {
+  
+  if(is.null(check_connection()))
+    return(NULL)
+  
+  con <- values$con
   
   write.serialConnection(con, "G90"); Sys.sleep(1)  # absolute position mode
   write.serialConnection(con, paste0("G1F", input$speed*60)); Sys.sleep(1) # set speed

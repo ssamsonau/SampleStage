@@ -58,3 +58,33 @@ observeEvent(input$disconnect, {
   values$is_open <- F
   
 })
+
+
+##################
+########## check connection function
+check_connection <- function(){
+  if (is.null(values$con)) {
+    showModal(
+      modalDialog(
+        title = "Important message",
+        "Establish connection first",
+        easyClose = T
+      )
+    )
+    return(NULL)
+  }
+  
+  if (!isOpen(values$con)) {
+    showModal(
+      modalDialog(
+        title = "Important message",
+        "Establish connection first",
+        easyClose = T
+      )
+    )
+    return(NULL)
+  }
+  
+  return("good to go")
+
+}
